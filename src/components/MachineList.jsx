@@ -4,11 +4,11 @@ import { Box, Button, Typography, Grid, Card, CardContent, CardMedia } from '@mu
 const MachineList = () => {
     const [machines, setMachines] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 2;
+    const totalPages = 10;
 
     const fetchMachines = async (page) => {
         try {
-            const response = await fetch(`http://localhost:3000/machines?page=${page}&limit=10`);
+            const response = await fetch(`http://localhost:3000/machines?page=${page}&limit=500`);
             const data = await response.json();
             setMachines(data.results || []);
         } catch (error) {
@@ -30,7 +30,7 @@ const MachineList = () => {
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h4" gutterBottom>
-                Machine List
+                Machine List 
             </Typography>
             <Grid container spacing={3}>
                 {machines.length > 0 ? (
