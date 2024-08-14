@@ -8,7 +8,7 @@ const MachineList = () => {
 
     const fetchMachines = async (page) => {
         try {
-            const response = await fetch(`http://localhost:3000/machines?page=${page}&limit=500`);
+            const response = await fetch(`http://localhost:3000/machines?page=${page}&limit=10`);
             const data = await response.json();
             setMachines(data.results || []);
         } catch (error) {
