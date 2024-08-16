@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, Grid, Card, CardContent, CardMedia } from '@mui/material';
+import { Box, Button, Typography, Grid, Card, CardContent, CardMedia, MenuItem, Select, FormControl } from '@mui/material';
+import { useSearchParams } from 'react-router-dom';
 
 const MachineList = () => {
     const [machines, setMachines] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const totalPages = 10;
-
-    const fetchMachines = async (page) => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentPage = parseInt(searchParams.get('page')) || 1;
+    const currentLimit = parseInt(searchParams.get('limit')) || 10; 
+    const totalPages = 10; 
+    const fetchMachines = async (page, limit) => {
         try {
-            const response = await fetch(`http://localhost:3000/machines?page=${page}&limit=10`);
+            const response = await fetch(`http://localhost:3000/machines?page=${page}&limit=${limit}`);
             const data = await response.json();
             setMachines(data.results || []);
         } catch (error) {
@@ -18,13 +20,18 @@ const MachineList = () => {
     };
 
     useEffect(() => {
-        fetchMachines(currentPage);
-    }, [currentPage]);
+        fetchMachines(currentPage, currentLimit); 
+    }, [currentPage, currentLimit]);
 
     const handlePageChange = (page) => {
         if (page > 0 && page <= totalPages) {
-            setCurrentPage(page);
+            setSearchParams({ page, limit: currentLimit });
         }
+    };
+
+    const handleLimitChange = (event) => {
+        const newLimit = event.target.value;
+        setSearchParams({ page: 1, limit: newLimit }); 
     };
 
     return (
@@ -42,6 +49,7 @@ const MachineList = () => {
                                     height="200"
                                     image={machine.image}
                                     alt={machine.title}
+                                    loading="lazy" 
                                 />
                                 <CardContent>
                                     <Typography gutterBottom variant="h5" component="div">
@@ -63,7 +71,7 @@ const MachineList = () => {
                     <Typography>No machines available</Typography>
                 )}
             </Grid>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 3 }}>
                 <Button 
                     variant="contained" 
                     color="primary" 
@@ -72,6 +80,21 @@ const MachineList = () => {
                 >
                     Previous
                 </Button>
+                <Typography variant="body2" color="textSecondary">
+                    Page {currentPage} of {totalPages}
+                </Typography>
+                <FormControl sx={{ minWidth: 120 }}>
+                    <Select
+                        value={currentLimit}
+                        onChange={handleLimitChange}
+                        displayEmpty
+                        inputProps={{ 'aria-label': 'Items per page' }}
+                    >
+                        <MenuItem value={10}>10</MenuItem>
+                        <MenuItem value={15}>15</MenuItem>
+                        <MenuItem value={20}>20</MenuItem>
+                    </Select>
+                </FormControl>
                 <Button 
                     variant="contained" 
                     color="primary" 
